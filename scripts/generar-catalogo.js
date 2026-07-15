@@ -46,7 +46,11 @@ async function scrollCompleto(page) {
     console.log(`\n=== Categoría: ${categoria} ===`);
 
     for (let i = 1; i <= MAX_PAGINAS; i++) {
-      const url = `${SHOP_BASE.replace(/\/$/, '')}/categoria-producto/${categoria}/page/${i}/`;
+      // La página 1 no lleva "/page/1/" (patrón estándar de WordPress/WooCommerce),
+      // desde la página 2 en adelante sí se agrega "/page/N/".
+      const url = i === 1
+        ? `${SHOP_BASE.replace(/\/$/, '')}/categoria-producto/${categoria}/`
+        : `${SHOP_BASE.replace(/\/$/, '')}/categoria-producto/${categoria}/page/${i}/`;
       console.log(`Capturando página ${i}: ${url}`);
 
       let response;
