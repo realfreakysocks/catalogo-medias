@@ -69,6 +69,18 @@ async function scrollCompleto(page) {
       // Espera extra a que terminen de cargar imágenes de producto,
       // sin depender de que la red quede 100% quieta.
       await page.waitForTimeout(2500);
+
+      // Si la página no tiene ni un producto, ya llegamos al final de esta
+      // categoría (muchos temas de WordPress no dan 404, solo muestran vacío).
+      const cantidadProductos = await page
+        .$$eval('ul.products li.product, .products .product', (els) => els.length)
+        .catch(() => 0);
+
+      if (cantidadProductos === 0) {
+        console.log('No hay productos en esta página. Fin de esta categoría.');
+        break;
+      }
+
       await scrollCompleto(page);
       await page.waitForTimeout(2000);
 
