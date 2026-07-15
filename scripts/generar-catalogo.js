@@ -55,7 +55,7 @@ async function scrollCompleto(page) {
 
       let response;
       try {
-        response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        response = await page.goto(url, { waitUntil: 'load', timeout: 45000 });
       } catch (err) {
         console.log(`No se pudo cargar (${err.message}). Fin de esta categoría.`);
         break;
@@ -66,8 +66,11 @@ async function scrollCompleto(page) {
         break;
       }
 
+      // Espera extra a que terminen de cargar imágenes de producto,
+      // sin depender de que la red quede 100% quieta.
+      await page.waitForTimeout(2500);
       await scrollCompleto(page);
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
 
       await page.screenshot({
         path: `${carpeta}/pagina-${i}.jpg`,
