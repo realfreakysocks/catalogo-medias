@@ -12,6 +12,7 @@ const CATEGORIAS  = (process.env.CATEGORIAS || '').split(',').map(c => c.trim())
 const ANCHO_VENTANA = parseInt(process.env.ANCHO_VENTANA || '1440', 10); // "modo escritorio"
 const ALTO_VENTANA  = parseInt(process.env.ALTO_VENTANA || '900', 10);
 const MAX_PAGINAS   = 30; // límite de seguridad, no debería llegar ni cerca
+const CLAVE_BYPASS  = process.env.CLOUDFLARE_BYPASS_SECRET || '';
 
 if (!SHOP_BASE || CATEGORIAS.length === 0) {
   console.error('Faltan SHOP_BASE o CATEGORIAS.');
@@ -51,9 +52,12 @@ async function scrollCompleto(page) {
     for (let i = 1; i <= MAX_PAGINAS; i++) {
       // La página 1 no lleva "/page/1/" (patrón estándar de WordPress/WooCommerce),
       // desde la página 2 en adelante sí se agrega "/page/N/".
-      const url = i === 1
+      // Se agrega ?catalogo_bot=CLAVE para que la Page Rule de Cloudflare
+      // deje pasar al robot sin el reto "Just a moment".
+      const base = i === 1
         ? `${SHOP_BASE.replace(/\/$/, '')}/categoria-producto/${categoria}/`
         : `${SHOP_BASE.replace(/\/$/, '')}/categoria-producto/${categoria}/page/${i}/`;
+      const url = CLAVE_BYPASS ? `${base}?catalogo_bot=${encodeURIComponent(CLAVE_BYPASS)}` : base;
       console.log(`Capturando página ${i}: ${url}`);
 
       let response;
