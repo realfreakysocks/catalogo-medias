@@ -37,7 +37,10 @@ async function scrollCompleto(page) {
 
 (async () => {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: ANCHO_VENTANA, height: ALTO_VENTANA } });
+  const page = await browser.newPage({
+    viewport: { width: ANCHO_VENTANA, height: ALTO_VENTANA },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  });
 
   for (const categoria of CATEGORIAS) {
     const carpeta = `capturas/${categoria}`;
@@ -78,7 +81,16 @@ async function scrollCompleto(page) {
         .catch(() => 0);
 
       if (cantidadProductos === 0) {
-        console.log('No hay productos en esta página. Fin de esta categoría.');
+        const titulo = await page.title().catch(() => '(sin título)');
+        console.log(`No hay productos en esta página. Título de la página: "${titulo}"`);
+        // Guardamos captura de diagnóstico igual, para ver qué se está mostrando.
+        await page.screenshot({
+          path: `${carpeta}/DIAGNOSTICO-pagina-${i}.jpg`,
+          fullPage: true,
+          quality: 85,
+          type: 'jpeg',
+        });
+        console.log('Fin de esta categoría.');
         break;
       }
 
