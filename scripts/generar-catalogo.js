@@ -71,9 +71,10 @@ async function scrollCompleto(page) {
       await page.waitForTimeout(2500);
 
       // Si la página no tiene ni un producto, ya llegamos al final de esta
-      // categoría (muchos temas de WordPress no dan 404, solo muestran vacío).
+      // categoría. Contamos links únicos a /producto/ en vez de depender
+      // de una clase CSS específica (cada tema usa nombres distintos).
       const cantidadProductos = await page
-        .$$eval('ul.products li.product, .products .product', (els) => els.length)
+        .$$eval('a[href*="/producto/"]', (els) => new Set(els.map((el) => el.href)).size)
         .catch(() => 0);
 
       if (cantidadProductos === 0) {
@@ -82,7 +83,7 @@ async function scrollCompleto(page) {
       }
 
       await scrollCompleto(page);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
 
       await page.screenshot({
         path: `${carpeta}/pagina-${i}.jpg`,
