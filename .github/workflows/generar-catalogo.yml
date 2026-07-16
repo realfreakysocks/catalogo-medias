@@ -33,6 +33,7 @@ jobs:
         env:
           SHOP_BASE: ${{ github.event.inputs.shop_base }}
           CATEGORIAS: ${{ github.event.inputs.categorias }}
+          CLOUDFLARE_BYPASS_SECRET: ${{ secrets.CLOUDFLARE_BYPASS_SECRET }}
         run: node scripts/generar-catalogo.js
 
       - name: Publicar las imágenes en GitHub Pages
